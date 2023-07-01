@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-# name: discourse-plugin-name
+# name: discourse-gitcoin-passport
 # about: TODO
 # version: 0.0.1
-# authors: Discourse
+# authors: Spect
 # url: TODO
 # required_version: 2.7.0
 
-enabled_site_setting :plugin_name_enabled
+enabled_site_setting :discourse_gitcoin_passport_enabled
 
-module ::MyPluginModule
-  PLUGIN_NAME = "discourse-plugin-name"
+module ::DiscourseGitcoinPassport
+  PLUGIN_NAME = "discourse-gitcoin-passport"
 end
 
-require_relative "lib/my_plugin_module/engine"
+require_relative "lib/gitcoin_passport_module/engine"
 
 after_initialize do
   # Code which should run after Rails has finished booting

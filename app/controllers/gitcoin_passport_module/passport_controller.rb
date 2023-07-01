@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module ::MyPluginModule
-  class ExamplesController < ::ApplicationController
+module ::GitcoinPassportModule
+  class PassportController < ::ApplicationController
     requires_plugin PLUGIN_NAME
 
     def index
