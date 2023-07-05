@@ -1,4 +1,16 @@
 plugins:
-  plugin_name_enabled:
+  gitcoin_passport_enabled:
     default: true
     client: true
+  gitcoin_passport_forum_level_score_to_create_account:
+    client: true
+    default: 12
+  gitcoin_passport_forum_level_score_to_post:
+    client: true
+    default: 17
+  gitcoin_passport_forum_level_score_to_create__new_topic:
+    client: true
+    default: 20
+  gitcoin_passport_scorer_id:
+    client: true
+    default: 0
