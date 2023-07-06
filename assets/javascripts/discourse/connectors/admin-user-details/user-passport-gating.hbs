@@ -7,7 +7,7 @@
     <div class="display-row">
       <AdminEditableField
         @name="gitcoin_passport.user_level_settings.minimum_score_to_post"
-        @value={{this.minScoreToPost}}
+        @value={{this.args.outletArgs.model.min_score_to_post}}
         @action={{action "saveMinimumScoreToCreatePost"}}
         @editing={{this.args.outletArgs.model.editingMinimumScoreToCreatePost}}
       />
@@ -15,7 +15,7 @@
     <div class="display-row">
       <AdminEditableField
         @name="gitcoin_passport.user_level_settings.minimum_score_to_create_topic"
-        @value={{this.minScoreToCreateTopic}}
+        @value={{this.args.outletArgs.model.min_score_to_create_topic}}
         @action={{action "saveMinimumScoreToCreateTopic"}}
         @editing={{this.args.outletArgs.model.editingMinimumScoreToCreateTopic}}
       />

@@ -34,7 +34,7 @@ export default class UserPassportGating extends Component {
   saveMinimumScoreToCreatePost(newScore) {
     let userId = this.userId;
     const oldScore = this.minScoreToPost;
-    this.args.outletArgs.model.set("minScoreToPost", newScore);
+    this.args.outletArgs.model.set("min_score_to_post", newScore);
 
     ajax({
       url: "/passport/saveUserScore",
@@ -46,7 +46,7 @@ export default class UserPassportGating extends Component {
       },
     })
       .catch((e) => {
-        this.args.outletArgs.model.set("minScoreToPost", oldScore);
+        this.args.outletArgs.model.set("min_score_to_post", oldScore);
         popupAjaxError(e);
       })
       .finally(() => {
@@ -60,7 +60,7 @@ export default class UserPassportGating extends Component {
   saveMinimumScoreToCreateTopic(newScore) {
     let userId = this.userId;
     const oldScore = this.minScoreToCreateTopic;
-    this.args.outletArgs.model.set("minScoreToCreateTopic", newScore);
+    this.args.outletArgs.model.set("min_score_to_create_topic", newScore);
     ajax({
       url: "/passport/saveUserScore",
       type: "PUT",
@@ -71,7 +71,7 @@ export default class UserPassportGating extends Component {
       },
     })
       .catch((e) => {
-        this.args.outletArgs.model.set("minScoreToCreateTopic", oldScore);
+        this.args.outletArgs.model.set("min_score_to_create_topic", oldScore);
         popupAjaxError(e);
       })
       .finally(() => {
