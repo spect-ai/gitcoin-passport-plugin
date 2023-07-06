@@ -16,3 +16,10 @@ en:
         minimum_score_to_post_description: "Users must have this score on Gitcoin Passport to post on forum"
         minimum_score_to_create_topic: "Minimum score to create a new topic"
         minimum_score_to_create_topic_description: "Users must have this score on Gitcoin Passport to create a new topic on forum"
+      category_level_settings:
+        heading: "Sybil Protection"
+        minimum_score_to_post: "Minimum score to post"
+        minimum_score_to_post_description: "Users must have this score on Gitcoin Passport to post on this category"
+        minimum_score_to_create_topic: "Minimum score to create a new topic"
+        minimum_score_to_create_topic_description: "Users must have this score on Gitcoin Passport to create a new topic on this category"
+        sybil_protection_info: "Sybil protection scores have a higher priority than groups, that is, if a person is part of the group but does not satisfies a score requirement they would not be able to perform the action."

@@ -31,10 +31,6 @@ after_initialize do
   require_relative "app/models/user_passport_score.rb"
   require_relative "app/models/category_passport_score.rb"
 
-  reloadable_patch do |plugin|
-    # Admin::UsersController.prepend DiscourseGitcoinPassport::AdminUsersControllerExtension
-    # AdminDetailedUserSerializer.prepend DiscourseGitcoinPassport::AdminDetailedUserSerializerExtension
-  end
 
   DiscourseGitcoinPassport::Engine.routes.draw do
     get "/score" => "passport#score"
@@ -60,5 +56,20 @@ after_initialize do
       .where(user_id: object.id, user_action_type: 4).exists? ? UserPassportScore.where(user_id: object.id, user_action_type: 4).first.required_score : 0
   end
 
+  add_to_serializer(
+    :category,
+    :min_score_to_post,
+  ) do
+    CategoryPassportScore
+      .where(category_id: object.id, user_action_type: 5).exists? ? CategoryPassportScore.where(category_id: object.id, user_action_type: 5).first.required_score : 0
+  end
+
+  add_to_serializer(
+    :category,
+    :min_score_to_create_topic,
+  ) do
+    CategoryPassportScore
+      .where(category_id: object.id, user_action_type: 4).exists? ? CategoryPassportScore.where(category_id: object.id, user_action_type: 4).first.required_score : 0
+  end
 
 end
