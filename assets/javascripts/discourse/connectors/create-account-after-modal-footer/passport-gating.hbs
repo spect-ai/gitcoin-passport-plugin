@@ -1,0 +1,36 @@
+{{#if (eq this.satisfiesScoreRequirement false)}}
+  <div class="create-account-feedback-message">
+    <div class="scores-container">
+      <p>{{i18n "gitcoin_passport.score.not_satisfied"}}</p>
+      <div class="score-container">
+        <div class="message">{{i18n
+            "gitcoin_passport.score.minimum_required_score"
+          }}</div>
+        <div
+          class="score"
+        >{{this.siteSettings.gitcoin_passport_forum_level_score_to_create_account}}</div>
+      </div>
+      <div class="score-container">
+        <div class="message">{{i18n "gitcoin_passport.score.user_score"}}</div>
+        <div class="score">
+          {{this.passportScore}}
+        </div>
+      </div>
+    </div>
+    <a
+      rel="noopener noreferrer"
+      target="_blank"
+      href="https://passport.gitcoin.co/"
+      class="btn btn-primary"
+      icon="external-link"
+    >
+      {{i18n "gitcoin_passport.go_to_passport"}}
+    </a>
+  </div>
+{{/if}}
+{{log this.hasConnectedWallet}}
+{{#if (eq this.hasConnectedWallet false)}}
+  <div class="create-account-feedback-message">
+    <p>{{i18n "gitcoin_passport.wallet_not_connected_error"}}</p>
+  </div>
+{{/if}}

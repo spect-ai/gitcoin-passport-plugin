@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 # name: discourse-gitcoin-passport
-# about: TODO
+# about: A discourse plugin to enable users to manage forum access using Gitcoin Passport
 # version: 0.0.1
 # authors: Spect
-# url: TODO
+# url: https://passport.gitcoin.co/
 # required_version: 2.7.0
 
 enabled_site_setting :gitcoin_passport_enabled
 
+register_asset "stylesheets/create-account-feedback-message.scss"
 
 after_initialize do
   module ::DiscourseGitcoinPassport
@@ -25,6 +26,7 @@ after_initialize do
   end
 
   require_relative "app/controllers/passport_controller.rb"
+  require_relative "app/controllers/users_controller.rb"
   require_relative "lib/gitcoin_passport_module/passport.rb"
   require_relative "lib/gitcoin_passport_module/post_guardian_edits.rb"
   require_relative "lib/gitcoin_passport_module/topic_guardian_edits.rb"
@@ -39,6 +41,10 @@ after_initialize do
   end
 
   Discourse::Application.routes.append { mount ::DiscourseGitcoinPassport::Engine, at: "/passport" }
+
+  reloadable_patch do |plugin|
+    UsersController.prepend DiscourseGitcoinPassport::UsersController
+  end
 
   add_to_serializer(
     :admin_detailed_user,

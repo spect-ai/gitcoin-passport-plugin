@@ -6,24 +6,24 @@ module ::DiscourseGitcoinPassport
 
     before_action :ensure_gitcoin_passport_enabled
 
-    def show
-      begin
-        render json: {
-                  user_passport_score: UserPassportScore.where(user_id: current_user.id, user_action_type: action_id).first
-        }
-      rescue DiscourseGitcoinPassport::Error => e
-        render_json_error e.message
-      end
-    end
-
     def score
-      begin
-        render json: {
-                 score: DiscourseGitcoinPassport::Passport.score("", SiteSetting.gitcoin_passport_scorer_id)
-               }
-      rescue DiscourseGitcoinPassport::Error => e
-        render_json_error e.message
-      end
+      sesh_hash = session.to_hash
+
+      raise Discourse::InvalidAccess.new("You must connect your wallet to view your score") if not
+                                                                                              sesh_hash or not
+                                                                                              sesh_hash['authentication'] or not
+                                                                                              sesh_hash['authentication']['extra_data'] or not
+                                                                                              sesh_hash['authentication']['extra_data']['uid']
+
+      ethaddress = sesh_hash['authentication']['extra_data']['uid']
+
+      puts "ethaddress: #{ethaddress}"
+
+
+
+      render json: {
+                score: DiscourseGitcoinPassport::Passport.score(ethaddress, SiteSetting.gitcoin_passport_scorer_id)
+              }
     end
 
     def saveUserScore

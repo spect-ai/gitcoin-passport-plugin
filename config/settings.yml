@@ -2,6 +2,12 @@ plugins:
   gitcoin_passport_enabled:
     default: true
     client: true
+  gitcoin_passport_api_key:
+    client: true
+    default: 'api-key'
+  gitcoin_passport_scorer_id:
+    client: true
+    default: 0
   gitcoin_passport_forum_level_score_to_create_account:
     client: true
     default: 12
@@ -11,6 +17,4 @@ plugins:
   gitcoin_passport_forum_level_score_to_create__new_topic:
     client: true
     default: 20
-  gitcoin_passport_scorer_id:
-    client: true
-    default: 0
+

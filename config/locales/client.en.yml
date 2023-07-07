@@ -1,8 +1,14 @@
 en:
   js:
     gitcoin_passport:
+      url: "https://passport.gitcoin.co/"
+      go_to_passport: "Get Passport Stamps"
+      wallet_not_connected_error: "This action requires you to connect your wallet. Please click the 'Sign in With Ethereum' button to connect your wallet."
       score:
-        title: "Your Gitcoin Passport Score"
+        user_score: "Your Gitcoin Passport Score"
+        minimum_required_score: "Minimum Score Required"
+        not_satisfied: "This action requires you to have a minimum score on Gitcoin Passport."
+        wallet_not_connected: "Please connect your wallet to view your score."
       error_while_fetching_voters: "Sorry, there was an error displaying the voters."
       buttons:
         check_score: "Check Score"
