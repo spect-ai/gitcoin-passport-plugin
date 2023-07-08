@@ -17,7 +17,7 @@ plugins:
     client: true
     default: 17
     min: 0
-  gitcoin_passport_forum_level_score_to_create__new_topic:
+  gitcoin_passport_forum_level_score_to_create_new_topic:
     client: true
     default: 20
     min: 0

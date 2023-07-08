@@ -5,5 +5,5 @@ en:
     gitcoin_passport_scorer_id: "Passport Scorer ID"
     gitcoin_passport_forum_level_score_to_create_account: "Forum Level Score to Create Account"
     gitcoin_passport_forum_level_score_to_post: "Forum Level Score to Post"
-    gitcoin_passport_forum_level_score_to_create__new_topic: "Forum Level Score to Create New Topic"
+    gitcoin_passport_forum_level_score_to_create_new_topic: "Forum Level Score to Create New Topic"
     gitcoin_passport_last_date_to_connect_wallet_for_existing_users: "Last Date to Connect Wallet and Share Passport Scores for Existing Users. Please enter the date in YYYY-MM-DD format."
