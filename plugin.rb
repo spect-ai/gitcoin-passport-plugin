@@ -42,6 +42,60 @@ after_initialize do
 
   reloadable_patch do |plugin|
     UsersController.prepend DiscourseGitcoinPassport::UsersController
+
+    TopicGuardian.class_eval do
+      alias_method :existing_can_create_post_on_topic?, :can_create_post_on_topic?
+      alias_method :existing_can_create_topic_on_category?, :can_create_topic_on_category?
+
+      def can_create_post_on_topic?(topic)
+        puts "can_create_post_on_topic child"
+        if SiteSetting.gitcoin_passport_enabled and @user.associated_accounts and @user.associated_accounts.find { |account| account[:name] == 'siwe' }
+          minimum_required_score = SiteSetting.gitcoin_passport_forum_level_score_to_post.to_f
+          category_passport_score = CategoryPassportScore.where(category_id: topic.category_id, user_action_type: UserAction.types[:reply]).first
+          puts "category_passport_score #{category_passport_score}"
+          if category_passport_score
+            minimum_required_score = category_passport_score.required_score
+          end
+          user_passport_score = UserPassportScore.where(user_id: @user.id, user_action_type: UserAction.types[:reply]).first
+          if user_passport_score
+            minimum_required_score = user_passport_score.required_score
+          end
+          puts minimum_required_score
+          associated_siwe = @user.associated_accounts.find { |account| account[:name] == 'siwe' }
+          ethaddress = associated_siwe[:description]
+          score = DiscourseGitcoinPassport::Passport.score(ethaddress, SiteSetting.gitcoin_passport_scorer_id)
+          puts score
+          if score.to_f < minimum_required_score
+            return false
+          end
+        end
+        existing_can_create_post_on_topic?(topic)
+      end
+
+      def can_create_topic_on_category?(category)
+        puts "can_create_topic_on_category child"
+        if SiteSetting.gitcoin_passport_enabled and @user.associated_accounts and @user.associated_accounts.find { |account| account[:name] == 'siwe' }
+          minimum_required_score = SiteSetting.gitcoin_passport_forum_level_score_to_create_new_topic.to_f
+          category_passport_score = CategoryPassportScore.where(category_id: category.id, user_action_type: UserAction.types[:new_topic]).first
+          if category_passport_score and category_passport_score.required_score and category_passport_score.required_score > 0
+            minimum_required_score = category_passport_score.required_score
+          end
+          user_passport_score = UserPassportScore.where(user_id: @user.id, user_action_type: UserAction.types[:new_topic]).first
+          if user_passport_score and user_passport_score.required_score and user_passport_score.required_score > 0
+            minimum_required_score = user_passport_score.required_score
+          end
+          puts 'minimum_required_score is: ' + minimum_required_score.to_s
+          associated_siwe = @user.associated_accounts.find { |account| account[:name] == 'siwe' }
+          ethaddress = associated_siwe[:description]
+          score = DiscourseGitcoinPassport::Passport.score(ethaddress, SiteSetting.gitcoin_passport_scorer_id)
+          puts score
+          if score.to_f < minimum_required_score
+            return false
+          end
+        end
+        existing_can_create_topic_on_category?(category)
+      end
+    end
   end
 
   add_to_serializer(
@@ -76,62 +130,7 @@ after_initialize do
       .where(category_id: object.id, user_action_type: UserAction.types[:new_topic]).exists? ? CategoryPassportScore.where(category_id: object.id, user_action_type: UserAction.types[:new_topic]).first.required_score : 0
   end
 
+  self.add_model_callback(User, :before_destroy) { UserPassportScore.where(user_id: self.id).destroy_all }
+  self.add_model_callback(Category, :before_destroy) { CategoryPassportScore.where(category_id: self.id).destroy_all }
 
-  reloadable_patch do
-    TopicGuardian.class_eval do
-      alias_method :existing_can_create_post_on_topic?, :can_create_post_on_topic?
-      alias_method :existing_can_create_topic_on_category?, :can_create_topic_on_category?
-
-      def can_create_post_on_topic?(topic)
-        puts "can_create_post_on_topic child"
-        if SiteSetting.gitcoin_passport_enabled
-          minimum_required_score = SiteSetting.gitcoin_passport_forum_level_score_to_post.to_f
-          category_passport_score = CategoryPassportScore.where(category_id: topic.category_id, user_action_type: UserAction.types[:reply]).first
-          puts category_passport_score
-          if category_passport_score
-            minimum_required_score = category_passport_score.required_score
-          end
-          user_passport_score = UserPassportScore.where(user_id: @user.id, user_action_type: UserAction.types[:reply]).first
-          if user_passport_score
-            minimum_required_score = user_passport_score.required_score
-          end
-          puts minimum_required_score
-          puts JSON.generate(@user.associated_accounts)
-          associated_siwe = @user.associated_accounts.find { |account| account[:name] == 'siwe' }
-          ethaddress = associated_siwe[:description]
-          score = DiscourseGitcoinPassport::Passport.score(ethaddress, SiteSetting.gitcoin_passport_scorer_id)
-          puts score
-          if score.to_f < minimum_required_score
-            return false
-          end
-        end
-        existing_can_create_post_on_topic?(topic)
-      end
-
-      def can_create_topic_on_category?(category)
-        puts "can_create_topic_on_category child"
-        if SiteSetting.gitcoin_passport_enabled
-          minimum_required_score = SiteSetting.gitcoin_passport_forum_level_score_to_create_new_topic.to_f
-          category_passport_score = CategoryPassportScore.where(category_id: category.id, user_action_type: UserAction.types[:new_topic]).first
-          if category_passport_score and category_passport_score.required_score and category_passport_score.required_score > 0
-            minimum_required_score = category_passport_score.required_score
-          end
-          user_passport_score = UserPassportScore.where(user_id: @user.id, user_action_type: UserAction.types[:new_topic]).first
-          if user_passport_score and user_passport_score.required_score and user_passport_score.required_score > 0
-            minimum_required_score = user_passport_score.required_score
-          end
-          puts 'minimum_required_score is: ' + minimum_required_score.to_s
-          puts JSON.generate(@user.associated_accounts)
-          associated_siwe = @user.associated_accounts.find { |account| account[:name] == 'siwe' }
-          ethaddress = associated_siwe[:description]
-          score = DiscourseGitcoinPassport::Passport.score(ethaddress, SiteSetting.gitcoin_passport_scorer_id)
-          puts score
-          if score.to_f < minimum_required_score
-            return false
-          end
-        end
-        existing_can_create_topic_on_category?(category)
-      end
-    end
-  end
 end
