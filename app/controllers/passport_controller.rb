@@ -14,7 +14,7 @@ module ::DiscourseGitcoinPassport
                                                                                               sesh_hash['authentication'] or not
                                                                                               sesh_hash['authentication']['extra_data'] or not
                                                                                               sesh_hash['authentication']['extra_data']['uid']
-
+      puts 'PassportController connected wallet'
       ethaddress = sesh_hash['authentication']['extra_data']['uid']
 
       puts "ethaddress: #{ethaddress}"
@@ -36,8 +36,14 @@ module ::DiscourseGitcoinPassport
         params.require(:action_id)
 
         puts 'saveUserScore 2'
-        render json: { status: 403, error: "You must be logged in to access this resource" } if !current_user
-        render json: { status: 403, error: "You must be an admin to access this resource" } if !current_user.admin?
+        if !current_user
+          render json: { status: 403, error: "You must be logged in to access this resource" } if !current_user
+          return
+        end
+        if !current_user.admin?
+          render json: { status: 403, error: "You must be an admin to access this resource" }
+          return
+        end
 
         puts 'saveUserScore 3'
         user_passport_score = UserPassportScore.where(user_id: params[:user_id], user_action_type: params[:action_id])
@@ -72,8 +78,14 @@ module ::DiscourseGitcoinPassport
         params.require(:score)
         params.require(:action_id)
 
-        render json: { status: 403, error: "You must be logged in to access this resource" } if !current_user
-        render json: { status: 403, error: "You must be an admin to access this resource" } if !current_user.admin?
+        if !current_user
+          render json: { status: 403, error: "You must be logged in to access this resource" } if !current_user
+          return
+        end
+        if !current_user.admin?
+          render json: { status: 403, error: "You must be an admin to access this resource" }
+          return
+        end
 
         category_passport_score = CategoryPassportScore.where(category_id: params[:category_id], user_action_type: params[:action_id])
 
@@ -104,7 +116,12 @@ module ::DiscourseGitcoinPassport
     end
 
 
-
+    def refreshPassportScore
+      DiscourseGitcoinPassport::Passport.refresh_passport_score(current_user)
+      render json: {
+        score: score
+      }
+    end
 
     def ensure_gitcoin_passport_enabled
       if !SiteSetting.gitcoin_passport_enabled

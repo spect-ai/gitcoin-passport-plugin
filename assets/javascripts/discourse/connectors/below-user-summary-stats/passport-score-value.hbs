@@ -1,0 +1,13 @@
+<div class="passport-score-container">
+  <div class="passport-score-section">
+    <h2>
+      {{this.score}}
+    </h2>
+    <p class="score-label">{{i18n "gitcoin_passport.summary.score"}}</p>
+  </div>
+  <DButton
+    @class="btn-primary digest-refresh-button"
+    @action={{action "refreshScore"}}
+    @label="gitcoin_passport.summary.refresh"
+  />
+</div>

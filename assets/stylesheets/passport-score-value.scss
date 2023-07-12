@@ -1,0 +1,25 @@
+.passport-score-container {
+  // This makes the entire "box" (the li) clickable instead of a narrow area.
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 50px;
+}
+
+.passport-score-section {
+  // This makes the entire "box" (the li) clickable instead of a narrow area.
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  margin-bottom: 1px;
+}
+
+.score-label {
+  font-size: 1em;
+  opacity: 0.5;
+  color: var(--primary);
+}
