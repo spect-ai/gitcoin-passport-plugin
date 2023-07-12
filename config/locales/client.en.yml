@@ -3,6 +3,9 @@ en:
     gitcoin_passport:
       url: "https://passport.gitcoin.co/"
       go_to_passport: "Get Passport Stamps"
+      summary:
+        score: "Gitcoin Passport Score"
+        refresh: "Refresh"
       wallet_not_connected_error: "This action requires you to connect your wallet. Please click the 'Sign in With Ethereum' button to connect your wallet."
       score:
         user_score: "Your Gitcoin Passport Score"
@@ -29,3 +32,6 @@ en:
         minimum_score_to_create_topic: "Minimum score to create a new topic"
         minimum_score_to_create_topic_description: "Users must have this score on Gitcoin Passport to create a new topic on this category"
         sybil_protection_info: "Sybil protection scores have a higher priority than groups, that is, if a person is part of the group but does not satisfies a score requirement they would not be able to perform the action."
+      error:
+        while_fetching_score: "This forum is gated by Gitcoin Passport which requires your verified ethereum address. Please make sure you've used Sign in with Ethereum (on the right panel) to connect your wallet before creating your account."
+        doesnt_meet_requirement: "You dont have the required Gitcoin Passport score to perform this action. Your current Gitcoin Passport score is %{score}. The required score is %{required_score}. Please visit https://passport.gitcoin.co/ and collect stamps, then come back and try again."
