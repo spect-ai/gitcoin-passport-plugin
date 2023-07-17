@@ -11,8 +11,7 @@ export default class PassportScoreValue extends Component {
 
   @discourseComputed("outletArgs.user.passport_score")
   score() {
-    console.log("refreshing");
-    return this.outletArgs.user.passport_score;
+    return this.outletArgs.user.passport_score || 0;
   }
 
   @action
@@ -28,6 +27,7 @@ export default class PassportScoreValue extends Component {
         this.outletArgs.user.set("passport_score", result.score);
       })
       .catch((e) => {
+        console.log({ e });
         popupAjaxError(e);
       })
       .finally(() => {
