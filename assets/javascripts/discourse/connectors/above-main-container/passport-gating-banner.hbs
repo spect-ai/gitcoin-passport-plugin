@@ -1,0 +1,48 @@
+{{#if this.showPassportGatingMessage}}
+  <div class="row">
+    <div class="consent_banner alert alert-info">
+      <div class="column">
+        <span>
+          {{this.bannerMessage}}
+          <DButton
+            @display="link"
+            @action={{action this.redirectLink}}
+            @label={{this.redirectLinkText}}
+          />
+        </span>
+        {{#if this.showScores}}
+          <div class="passport-score-container">
+            <div class="passport-score-section">
+              <p>{{i18n
+                  "gitcoin_passport.banner.minimum_score_required"
+                  minimum_score_required=this.siteSettings.gitcoin_passport_forum_level_score_to_create_account
+                }}</p>
+            </div>
+            <div class="passport-score-section">
+              <p class="passport-score-text">{{i18n
+                  "gitcoin_passport.banner.user_passport_score"
+                  score=this.userScore
+                }}</p>
+            </div>
+          </div>
+        {{/if}}
+        {{#if this.showActivationDateInBanner}}
+          <div class="passport-score-section">
+            <p>{{i18n
+                "gitcoin_passport.banner.passport_gating_starts_on"
+                date=siteSettings.gitcoin_passport_last_date_to_connect_wallet_for_existing_users
+              }}</p>
+          </div>
+        {{/if}}
+      </div>
+      {{#if this.canDismiss}}
+        <DButton
+          @icon="times"
+          @action={{action "dismiss"}}
+          @class="btn btn-flat close"
+          @title="banner.close"
+        />
+      {{/if}}
+    </div>
+  </div>
+{{/if}}

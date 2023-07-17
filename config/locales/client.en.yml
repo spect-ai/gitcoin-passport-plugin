@@ -32,6 +32,13 @@ en:
         minimum_score_to_create_topic: "Minimum score to create a new topic"
         minimum_score_to_create_topic_description: "Users must have this score on Gitcoin Passport to create a new topic on this category"
         sybil_protection_info: "Sybil protection scores have a higher priority than groups, that is, if a person is part of the group but does not satisfies a score requirement they would not be able to perform the action."
-      error:
-        while_fetching_score: "This forum is gated by Gitcoin Passport which requires your verified ethereum address. Please make sure you've used Sign in with Ethereum (on the right panel) to connect your wallet before creating your account."
-        doesnt_meet_requirement: "You dont have the required Gitcoin Passport score to perform this action. Your current Gitcoin Passport score is %{score}. The required score is %{required_score}. Please visit https://passport.gitcoin.co/ and collect stamps, then come back and try again."
+      banner:
+        inactive_gating_not_connected_wallet: "This forum will be gated by Gitcoin Passport soon. Please link your ethereum address before then to continue posting."
+        active_gating_not_connected_wallet: "This forum is gated by Gitcoin Passport. Please link your ethereum address to continue posting."
+        active_gating_low_score: "This forum is gated by Gitcoin Passport. Unfortunately, you dont meet the requirements to post. Please increase your Gitcoin Passport score to continue posting."
+        inactive_gating_low_score: "This forum will be gated by Gitcoin Passport soon. Unfortunately, you wouldn't meet the requirements to post after this. Please increase your Gitcoin Passport score before then to continue posting."
+        link_to_passport: "Increase Passport Score"
+        link_to_connect_wallet: "Link your Wallet"
+        user_passport_score: "Your current score is %{score}"
+        minimum_score_required: "Minimum score required is %{minimum_score_required}"
+        passport_gating_starts_on: "Gating starts on %{date}"

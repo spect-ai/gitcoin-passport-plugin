@@ -1,5 +1,4 @@
 .passport-score-container {
-  // This makes the entire "box" (the li) clickable instead of a narrow area.
   display: flex;
   flex-direction: column;
   gap: 0px;
@@ -9,7 +8,6 @@
 }
 
 .passport-score-section {
-  // This makes the entire "box" (the li) clickable instead of a narrow area.
   display: flex;
   flex-direction: row;
   gap: 10px;
@@ -20,7 +18,6 @@
 }
 
 .user-summary-passport-score-container {
-  // This makes the entire "box" (the li) clickable instead of a narrow area.
   display: flex;
   flex-direction: column;
   gap: 8px;
