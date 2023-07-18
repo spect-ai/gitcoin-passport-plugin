@@ -3,6 +3,7 @@ import { inject as service } from "@ember/service";
 import Component from "@glimmer/component";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import UserAction from "discourse/models/user-action";
 
 export default class UserPassportGating extends Component {
   @service siteSettings;
@@ -21,7 +22,6 @@ export default class UserPassportGating extends Component {
   }
 
   get minScoreToPost() {
-    console.log(this.args.outletArgs.model);
     return this.args.outletArgs.model.min_score_to_post || 0;
   }
 
@@ -40,7 +40,7 @@ export default class UserPassportGating extends Component {
       type: "PUT",
       data: {
         user_id: userId,
-        action_id: 5,
+        action_id: UserAction.TYPES.posts,
         score: newScore,
       },
     })
@@ -65,7 +65,7 @@ export default class UserPassportGating extends Component {
       type: "PUT",
       data: {
         user_id: userId,
-        action_id: 4,
+        action_id: UserAction.TYPES.topics,
         score: newScore,
       },
     })

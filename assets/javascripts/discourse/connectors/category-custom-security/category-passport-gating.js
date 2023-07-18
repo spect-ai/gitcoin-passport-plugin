@@ -4,6 +4,7 @@ import { action } from "@ember/object";
 import { inject as service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import UserAction from "discourse/models/user-action";
 
 @tagName("")
 export default class CategoryPassportGating extends Component {
@@ -35,7 +36,7 @@ export default class CategoryPassportGating extends Component {
       type: "PUT",
       data: {
         category_id: categoryId,
-        action_id: 5,
+        action_id: UserAction.TYPES.posts,
         score: newScore,
       },
     })
@@ -61,7 +62,7 @@ export default class CategoryPassportGating extends Component {
       type: "PUT",
       data: {
         category_id: categoryId,
-        action_id: 4,
+        action_id: UserAction.TYPES.topics,
         score: newScore,
       },
     })
