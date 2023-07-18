@@ -19,15 +19,14 @@ export default class PassportGatingBanner extends Component {
   linkTo = null;
   linkText = null;
   showBanner = false;
-  showScores = false;
+  showUserScore = false;
+  showScoreRequiredToCreateAccount = false;
+  showScoreRequiredToPost = false;
+  showScoreRequiredToCreateTopic = false;
   showActivationDate = false;
   canDismiss = false;
 
   didInsertElement() {
-    console.log({
-      passportGatingActive: this.passportGatingActive,
-      currentUser: this.currentUser,
-    });
     if (!this.passportGatingActive && !this.currentUser?.ethaddress) {
       this.set(
         "message",
@@ -36,7 +35,10 @@ export default class PassportGatingBanner extends Component {
       this.set("linkTo", "linkAccount");
       this.set("linkText", "gitcoin_passport.banner.link_to_connect_wallet");
       this.set("showBanner", true);
-      this.set("showScores", false);
+      this.set("showUserScore", false);
+      this.set("showScoreRequiredToCreateAccount", false);
+      this.set("showScoreRequiredToPost", false);
+      this.set("showScoreRequiredToCreateTopic", false);
       this.set("showActivationDate", true);
       this.set("canDismiss", true);
       return;
@@ -48,7 +50,10 @@ export default class PassportGatingBanner extends Component {
       this.set("linkTo", "linkAccount");
       this.set("linkText", "gitcoin_passport.banner.link_to_connect_wallet");
       this.set("showBanner", true);
-      this.set("showScores", false);
+      this.set("showUserScore", false);
+      this.set("showScoreRequiredToCreateAccount", false);
+      this.set("showScoreRequiredToPost", false);
+      this.set("showScoreRequiredToCreateTopic", false);
       this.set("showActivationDate", false);
       this.set("canDismiss", false);
       return;
@@ -64,7 +69,10 @@ export default class PassportGatingBanner extends Component {
         this.set("linkTo", "goToPassport");
         this.set("linkText", "gitcoin_passport.banner.link_to_passport");
         this.set("showBanner", true);
-        this.set("showScores", true);
+        this.set("showUserScore", true);
+        this.set("showScoreRequiredToCreateAccount", true);
+        this.set("showScoreRequiredToPost", false);
+        this.set("showScoreRequiredToCreateTopic", false);
         this.set("showActivationDate", true);
         this.set("canDismiss", false);
         return;
@@ -81,14 +89,20 @@ export default class PassportGatingBanner extends Component {
         this.set("linkTo", "goToPassport");
         this.set("linkText", "gitcoin_passport.banner.link_to_passport");
         this.set("showBanner", true);
-        this.set("showScores", true);
+        this.set("showUserScore", true);
+        this.set("showScoreRequiredToCreateAccount", true);
+        this.set("showScoreRequiredToPost", false);
+        this.set("showScoreRequiredToCreateTopic", false);
         this.set("showActivationDate", false);
         this.set("canDismiss", false);
       }
       return;
     }
     this.set("showBanner", false);
-    this.set("showScores", false);
+    this.set("showUserScore", true);
+    this.set("showScoreRequiredToCreateAccount", true);
+    this.set("showScoreRequiredToPost", false);
+    this.set("showScoreRequiredToCreateTopic", false);
     this.set("showActivationDate", false);
     this.set("canDismiss", false);
     this.set("message", null);
@@ -106,15 +120,29 @@ export default class PassportGatingBanner extends Component {
     return this.showActivationDate;
   }
 
-  @discourseComputed("showScores")
+  @discourseComputed("showUserScore")
   userScore() {
-    console.log({ score: this.score });
-    return this.score || 0;
+    return this.currentUser.passport_score || 0;
+  }
+
+  @discourseComputed("showScoreRequiredToCreateAccount")
+  scoreRequiredToCreateAccount() {
+    return this.siteSettings
+      .gitcoin_passport_forum_level_score_to_create_account;
+  }
+
+  @discourseComputed("showScoreRequiredToPost")
+  scoreRequiredToPost() {
+    return 8;
+  }
+
+  @discourseComputed("showScoreRequiredToCreateTopic")
+  scoreRequiredToCreateTopic() {
+    return 9;
   }
 
   @discourseComputed("passportGatingMessageHiddenByUser", "showBanner")
   showPassportGatingMessage() {
-    console.log({ t: this.passportGatingMessageHiddenByUser });
     if (
       !this.currentUser ||
       !this.passportGatingEnabled ||
@@ -122,10 +150,6 @@ export default class PassportGatingBanner extends Component {
     ) {
       return false;
     }
-    console.log({
-      showBanner: this.showBanner,
-      passportGatingMessageHiddenByUser: this.passportGatingMessageHiddenByUser,
-    });
     return this.showBanner && !this.passportGatingMessageHiddenByUser;
   }
 
