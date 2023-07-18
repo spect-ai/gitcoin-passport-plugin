@@ -16,10 +16,10 @@ register_asset "stylesheets/passport-score-value.scss"
 require_relative "app/validators/ethaddress_validator.rb"
 require_relative "app/validators/date_validator.rb"
 
+
 after_initialize do
   module ::DiscourseGitcoinPassport
     PLUGIN_NAME = "discourse-gitcoin-passport"
-
 
     class Engine < ::Rails::Engine
       engine_name PLUGIN_NAME
@@ -29,6 +29,7 @@ after_initialize do
     class Error < StandardError
     end
   end
+
 
   require_relative "app/controllers/passport_controller.rb"
   require_relative "lib/gitcoin_passport_module/passport.rb"
@@ -44,123 +45,75 @@ after_initialize do
     put "/refreshPassportScore" => "passport#refreshPassportScore"
   end
 
+
   Discourse::Application.routes.append { mount ::DiscourseGitcoinPassport::Engine, at: "/passport" }
 
   reloadable_patch do |plugin|
     User.class_eval { has_many :user_passport_scores, dependent: :destroy }
     Category.class_eval { has_many :category_passport_scores, dependent: :destroy }
 
+
     UsersController.class_eval do
+      alias_method :existing_create, :create
       def create
         if SiteSetting.gitcoin_passport_enabled && SiteSetting.gitcoin_passport_scorer_id
-          puts "DiscourseGitcoinPassport::UsersController.create"
-          puts current_user.inspect
           sesh_hash = session.to_hash
           ethaddress = sesh_hash['authentication']['extra_data']['uid'] if sesh_hash['authentication'] && sesh_hash['authentication']['extra_data']
-          puts "ethaddress: #{ethaddress}"
           if (!ethaddress)
-            render json: { status: 403, error: "You must connect your wallet to create an account" }
-            return
+            return fail_with("gitcoin_passport.create_account_wallet_not_connected")
           end
 
           score = DiscourseGitcoinPassport::Passport.score(ethaddress, SiteSetting.gitcoin_passport_scorer_id)
           required_score_to_create_account = SiteSetting.gitcoin_passport_forum_level_score_to_create_account.to_f || 0
 
           if score.to_i < required_score_to_create_account
-            render json: { status: 403, reason: 'GitcoinPassportLessThanRequiredScore', error: "You must have a score of #{required_score_to_create_account} to create an account. Currently, you have a score of #{score}." }
+            message = I18n.t("gitcoin_passport.create_account_minimum_score_not_satisfied", score: score, required_score: required_score_to_create_account)
+            render json: { success: false, message: message }
             return
-          else
-            super
           end
-        else
-          super
         end
+        existing_create
       end
     end
 
     SiweAuthenticator.class_eval do
       def after_authenticate(auth_token, existing_account: nil)
-        puts "after_authenticate child"
-        if DiscourseGitcoinPassport::AccessWithoutPassport.expired?
-          puts "expired_due_to_no_gitcoin_passport_in_auth_token"
-          minimum_required_score = SiteSetting.gitcoin_passport_forum_level_score_to_create_account.to_f
+        association = UserAssociatedAccount.where(provider_name: auth_token[:provider], provider_uid: auth_token[:uid]).first
+        # If the user is already associated with an account, refresh the score and save it in the user table, this is mainly done
+        # for performance reasons so that we don't have to query the passport api every time we need to check the score
+        if association and association.user_id
+            user = User.where(id: association.user_id).first
+            score = DiscourseGitcoinPassport::Passport.refresh_passport_score(user)
+            if !score
+              score = 0
+            end
+            user.update(passport_score: score, passport_score_last_update: Time.now)
+        end
 
-          ethaddress = auth_token[:uid]
-          puts 'ethaddress is: ' + ethaddress
-          if (ethaddress == nil)
-            return(
-              Auth::Result.new.tap do |auth_result|
-                auth_result.failed = true
-                auth_result.failed_reason = I18n.t("gitcoin_passport.has_not_connected_wallet")
-              end
-            )
+        super
+      end
+
+      def after_create_account(user, auth)
+        if SiteSetting.gitcoin_passport_enabled
+          score = DiscourseGitcoinPassport::Passport.score(auth[:extra_data][:uid], SiteSetting.gitcoin_passport_scorer_id)
+          if !score
+            score = 0
           end
-          score = DiscourseGitcoinPassport::Passport.score(ethaddress, SiteSetting.gitcoin_passport_scorer_id)
-          puts 'Score inside after_authenticate is: ' + score.to_s
-
-          if score.to_f < minimum_required_score
-            return(
-              Auth::Result.new.tap do |auth_result|
-                auth_result.failed = true
-                failed_reason = I18n.t("gitcoin_passport.doesnt_meet_requirement", score: score, required_score: minimum_required_score)
-                auth_result.failed_reason = failed_reason
-              end
-            )
-          end
-
+          user.update(passport_score: score, passport_score_last_update: Time.now)
         end
         super
       end
     end
 
-    SessionController.class_eval do
-      alias_method :existing_login_error_check, :login_error_check
-      def login_error_check(user)
-        puts "create child"
-        puts user.inspect
-        if DiscourseGitcoinPassport::AccessWithoutPassport.expired?
-          puts "expired_due_to_no_gitcoin_passport_in_auth_token"
-          minimum_required_score = SiteSetting.gitcoin_passport_forum_level_score_to_create_account.to_f
-          puts 'associate_accounts is: ' + user[:associate_accounts].inspect
-          siwe_account = @user.associated_accounts.find { |account| account[:name] == "siwe" }
-          puts siwe_account.inspect
-          ethaddress = siwe_account[:description]
-
-          if (ethaddress == nil)
-            return(
-              { error:  I18n.t("gitcoin_passport.has_not_connected_wallet"), reason: "forbidden" }
-            )
-          end
-          score = DiscourseGitcoinPassport::Passport.score(ethaddress, SiteSetting.gitcoin_passport_scorer_id)
-          puts 'Score inside create is: ' + score.to_s
-
-          if score.to_f < minimum_required_score
-              return(
-                { error:  I18n.t("gitcoin_passport.doesnt_meet_requirement"), reason: "forbidden" }
-              )
-          end
-        end
-        existing_login_error_check(user)
-      end
-    end
 
     TopicGuardian.class_eval do
       alias_method :existing_can_create_post_on_topic?, :can_create_post_on_topic?
       alias_method :existing_can_create_topic_on_category?, :can_create_topic_on_category?
 
-      def ethaddress
-        puts "ethaddress child"
-        siwe_account = @user.associated_accounts.find { |account| account[:name] == "siwe" }
-        puts siwe_account.inspect
-        siwe_account[:description]
-      end
-
-
       def can_create_post_on_topic?(topic)
-        puts "can_create_post_on_topic child"
         if DiscourseGitcoinPassport::AccessWithoutPassport.expired?
-          puts "expired_due_to_no_gitcoin_passport_associated_accounts"
-          if !DiscourseGitcoinPassport::Passport.has_minimimum_required_score?(ethaddress(), @user.id, topic.category_id, UserAction.types[:reply])
+          category = Category.where(id: topic.category_id).first
+          if !DiscourseGitcoinPassport::Passport.has_minimimum_required_score?(@user, category, UserAction.types[:reply])
             return false
           end
         end
@@ -168,18 +121,23 @@ after_initialize do
       end
 
       def can_create_topic_on_category?(category)
-        puts "can_create_topic_on_category child"
-        puts @user.inspect
 
         if DiscourseGitcoinPassport::AccessWithoutPassport.expired?
-          puts "expired_due_to_no_gitcoin_passport_associated_accounts"
-          if !DiscourseGitcoinPassport::Passport.has_minimimum_required_score?(ethaddress(), @user.id, category.id, UserAction.types[:new_topic])
+          if !DiscourseGitcoinPassport::Passport.has_minimimum_required_score?(@user, category, UserAction.types[:new_topic])
             return false
           end
         end
         existing_can_create_topic_on_category?(category)
       end
     end
+  end
+
+  add_to_serializer(
+    :current_user,
+    :ethaddress,
+  ) do
+    siwe_account = object.associated_accounts.find { |account| account[:name] == "siwe" }
+    siwe_account[:description] if siwe_account
   end
 
   add_to_serializer(
