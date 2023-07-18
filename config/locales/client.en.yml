@@ -31,7 +31,7 @@ en:
         minimum_score_to_post_description: "Users must have this score on Gitcoin Passport to post on this category"
         minimum_score_to_create_topic: "Minimum score to create a new topic"
         minimum_score_to_create_topic_description: "Users must have this score on Gitcoin Passport to create a new topic on this category"
-        sybil_protection_info: "Sybil protection scores have a higher priority than groups, that is, if a person is part of the group but does not satisfies a score requirement they would not be able to perform the action."
+        sybil_protection_info: "Sybil protection scores have a higher priority than groups, that is, if a person is part of the group but does not satisfy a score requirement they would not be able to perform the action."
       banner:
         inactive_gating_not_connected_wallet: "This forum will be gated by Gitcoin Passport soon. Please link your ethereum address before then to continue posting."
         active_gating_not_connected_wallet: "This forum is gated by Gitcoin Passport. Please link your ethereum address to continue posting."
@@ -41,4 +41,6 @@ en:
         link_to_connect_wallet: "Link your Wallet"
         user_passport_score: "Your current score is %{score}"
         minimum_score_required: "Minimum score required is %{minimum_score_required}"
+        score_required_to_post: "Score required to post %{score_required} to post"
+        score_required_to_create_topic: "Score required to create a topic %{score_required}"
         passport_gating_starts_on: "Gating starts on %{date}"
