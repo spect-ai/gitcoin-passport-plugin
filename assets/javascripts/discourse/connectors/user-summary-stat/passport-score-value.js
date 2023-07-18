@@ -22,12 +22,9 @@ export default class PassportScoreValue extends Component {
       type: "PUT",
     })
       .then((result) => {
-        console.log({ rest: result });
-        console.log({ outletArgs: this.outletArgs.user });
         this.outletArgs.user.set("passport_score", result.score);
       })
       .catch((e) => {
-        console.log({ e });
         popupAjaxError(e);
       })
       .finally(() => {
