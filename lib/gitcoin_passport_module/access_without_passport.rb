@@ -11,4 +11,14 @@ class DiscourseGitcoinPassport::AccessWithoutPassport
     end
     return false
   end
+
+  def self.already_has_passport?(user)
+    if SiteSetting.gitcoin_passport_enabled
+      siwe_account = user.associated_accounts.find { |account| account[:name] == "siwe" }
+      if siwe_account
+        return true
+      end
+    end
+    return false
+  end
 end
