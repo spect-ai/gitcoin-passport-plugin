@@ -1,17 +1,14 @@
 class CategoryPassportScore < ActiveRecord::Base
   belongs_to :category
 
-  def has_category_level_score?(category)
-    category&.id && passport_scores.where(category_id: category.id).exists?
-  end
+  validates :required_score,
+  numericality: {
+    greater_than_or_equal_to: 0,
+    less_than_or_equal_to: 100,
+    allow_nil: false,
+  }
+  validates :category_id, uniqueness: { scope: :user_action_type }
 
-  def category_level_scores(category)
-    return passport_scores.where(category_id: category.id)
-  end
-
-  def category_action_scores(category, action)
-    return passport_scores.where(category_id: category.id, user_action_type: action.id)
-  end
 end
 
 

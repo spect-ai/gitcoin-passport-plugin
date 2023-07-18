@@ -1,17 +1,14 @@
 class UserPassportScore < ActiveRecord::Base
   belongs_to :user
 
-  def has_user_level_score?(user)
-    user&.id && passport_scores.where(user_id: user.id).exists?
-  end
+  validates :required_score,
+  numericality: {
+    greater_than_or_equal_to: 0,
+    less_than_or_equal_to: 100,
+    allow_nil: false,
+  }
+  validates :user_id, uniqueness: { scope: :user_action_type }
 
-  def user_level_scores(user)
-    return passport_scores.where(user_id: user.id)
-  end
-
-  def user_action_scores(user, action)
-    return passport_scores.where(user_id: user.id, user_action_id: action.id)
-  end
 end
 
 
